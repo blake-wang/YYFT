@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ResourceBundleManager">
-    <file url="file://$PROJECT_DIR$/src/resources/conf.properties" />
-    <file url="file://$PROJECT_DIR$/src/resources/conf_pre.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/java/main/java/main/java/main/java/resources/conf.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/java/main/java/main/java/main/java/resources/conf_pre.properties" />
   </component>
 </project>
