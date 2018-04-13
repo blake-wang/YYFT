@@ -16,32 +16,32 @@ public class RedisClient implements KryoSerializable {
     public static JedisPool jedisPool;
     public String host;
 
-    public RedisClient(){
+    public RedisClient() {
         Runtime.getRuntime().addShutdownHook(new CleanWorkThread());
     }
 
-    public RedisClient(String host){
-        this.host=host;
+    public RedisClient(String host) {
+        this.host = host;
         Runtime.getRuntime().addShutdownHook(new CleanWorkThread());
         jedisPool = new JedisPool(new GenericObjectPoolConfig(), host);
     }
 
-    static class CleanWorkThread extends Thread{
+    static class CleanWorkThread extends Thread {
         @Override
         public void run() {
             System.out.println("Destroy jedis pool");
-            if (null != jedisPool){
+            if (null != jedisPool) {
                 jedisPool.destroy();
                 jedisPool = null;
             }
         }
     }
 
-    public Jedis getResource(){
+    public Jedis getResource() {
         return jedisPool.getResource();
     }
 
-    public void returnResource(Jedis jedis){
+    public void returnResource(Jedis jedis) {
         jedisPool.returnResource(jedis);
     }
 
@@ -50,7 +50,7 @@ public class RedisClient implements KryoSerializable {
     }
 
     public void read(Kryo kryo, Input input) {
-        host=kryo.readObject(input, String.class);
-        this.jedisPool =new JedisPool(new GenericObjectPoolConfig(), host) ;
+        host = kryo.readObject(input, String.class);
+        this.jedisPool = new JedisPool(new GenericObjectPoolConfig(), host);
     }
 }

@@ -12,8 +12,8 @@ import org.apache.spark.rdd.RDD
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Created by sumenghu on 2016/12/7.
- */
+  * Created by sumenghu on 2016/12/7.
+  */
 object DownloadCF {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("DownloadCF")
@@ -32,7 +32,7 @@ object DownloadCF {
 
     hiveContext.sql("select sub_table.game_id,sub_table.top_game_id from " +
       "(select game_id,top_game_id,row_number() over (partition by game_id order by top_game_id) as rn from download_result_top) sub_table " +
-      "where sub_table.rn <=80 order by sub_table.game_id, sub_table.rn desc" ).registerTempTable("download_result_top80")
+      "where sub_table.rn <=80 order by sub_table.game_id, sub_table.rn desc").registerTempTable("download_result_top80")
 
     val resultDf = hiveContext.sql("select game_id,concat_ws('|',collect_set(top_game_id)) from (select game_id,split(top_game_id,'_')[1] top_game_id from download_result_top80) t group by game_id")
 
@@ -43,7 +43,7 @@ object DownloadCF {
         " values(?,?) on duplicate key update game_id_rs=?"
       val params = new ArrayBuffer[Array[Any]]()
       for (insertedRow <- rows) {
-        params.+=(Array[Any](insertedRow.get(0),insertedRow.get(1),insertedRow.get(1)))
+        params.+=(Array[Any](insertedRow.get(0), insertedRow.get(1), insertedRow.get(1)))
       }
       try {
         MySqlUtils.doBatch(sqlText, params, conn)

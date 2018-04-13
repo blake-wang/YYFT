@@ -12,9 +12,9 @@ import org.apache.spark.{SparkContext, SparkConf}
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Created by JSJSB-0071 on 2017/1/9.
- *广告数据补充
- */
+  * Created by JSJSB-0071 on 2017/1/9.
+  * 广告数据补充
+  */
 object GamePublishPayAccountKpiOffLine {
   val logger = Logger.getLogger(GamePublishPayAccountKpiOffLine.getClass)
 
@@ -25,20 +25,20 @@ object GamePublishPayAccountKpiOffLine {
     val startdday = args(0)
     val currentday = args(1)
 
-//    val conn = MySqlUtils.getConn()
-//    val statement = conn.createStatement
-//    //旧平台
-//    var mysqlText = "update bi_gamepublic_basekpi set pay_account_num=0,dau_pay_account_num=0 " +
-//      "where publish_time>='"+startdday +"' and publish_time <='"+currentday+" 59:59:59'"
-//    statement.executeUpdate(mysqlText);
-//    //新表
-//    mysqlText = "update bi_gamepublic_base_day_kpi set pay_account_num=0  " +
-//      "where publish_date>='"+startdday +"' and publish_date <='"+currentday+"'"
-//    statement.executeUpdate(mysqlText);
-//
-//    println("mysqlText: "+mysqlText)
-//    statement.close()
-//    conn.close()
+    //    val conn = MySqlUtils.getConn()
+    //    val statement = conn.createStatement
+    //    //旧平台
+    //    var mysqlText = "update bi_gamepublic_basekpi set pay_account_num=0,dau_pay_account_num=0 " +
+    //      "where publish_time>='"+startdday +"' and publish_time <='"+currentday+" 59:59:59'"
+    //    statement.executeUpdate(mysqlText);
+    //    //新表
+    //    mysqlText = "update bi_gamepublic_base_day_kpi set pay_account_num=0  " +
+    //      "where publish_date>='"+startdday +"' and publish_date <='"+currentday+"'"
+    //    statement.executeUpdate(mysqlText);
+    //
+    //    println("mysqlText: "+mysqlText)
+    //    statement.close()
+    //    conn.close()
 
     val sparkConf = new SparkConf().setAppName(this.getClass.getName.replace("$", ""))
       .set("spark.sql.shuffle.partitions", PropertiesUtils.getRelativePathValue("spark_sql_shuffle_partitions"))
@@ -47,61 +47,62 @@ object GamePublishPayAccountKpiOffLine {
     sqlContext.sql("use yyft")
 
     //bi_gamepublic_basekpi 充值账号数  pay_account_num,dau_pay_account_num
-    val payAccountSql="select split(tt.publish_time,':')[0],tt.game_id,tt.expand_channel,count(distinct tt.game_account) total \nfrom (\nselect distinct min(o.order_time) publish_time,o.game_id, if(r.expand_channel = '','21',r.expand_channel) expand_channel,lower(trim(o.game_account)) game_account \nfrom ods_regi_rz r \njoin ods_order o on lower(trim(o.game_account))=lower(trim(r.game_account))\njoin (select distinct game_id from ods_publish_game) pg on r.game_id=pg.game_id\nwhere o.game_id is not null and o.order_status=4 and to_date(o.order_time) >='startdday' and to_date(o.order_time) <='currentday'   \ngroup by to_date(o.order_time),o.game_id, if(r.expand_channel = '','21',r.expand_channel),lower(trim(o.game_account))\n) tt\ngroup by split(tt.publish_time,':')[0],tt.game_id,tt.expand_channel"
+    val payAccountSql = "select split(tt.publish_time,':')[0],tt.game_id,tt.expand_channel,count(distinct tt.game_account) total \nfrom (\nselect distinct min(o.order_time) publish_time,o.game_id, if(r.expand_channel = '','21',r.expand_channel) expand_channel,lower(trim(o.game_account)) game_account \nfrom ods_regi_rz r \njoin ods_order o on lower(trim(o.game_account))=lower(trim(r.game_account))\njoin (select distinct game_id from ods_publish_game) pg on r.game_id=pg.game_id\nwhere o.game_id is not null and o.order_status=4 and to_date(o.order_time) >='startdday' and to_date(o.order_time) <='currentday'   \ngroup by to_date(o.order_time),o.game_id, if(r.expand_channel = '','21',r.expand_channel),lower(trim(o.game_account))\n) tt\ngroup by split(tt.publish_time,':')[0],tt.game_id,tt.expand_channel"
       .replace("startdday", startdday).replace("currentday", currentday)
     val payAccountDf = sqlContext.sql(payAccountSql)
     foreachPayAccountPartition(payAccountDf)
 
 
     //bi_gamepublic_base_day_kpi 充值账号数 pay_account_num
-     //val payDayAccountSql="select split(tt.publish_time,' ')[0],tt.game_id,tt.expand_channel,count(distinct tt.game_account) total from (\nselect distinct min(o.order_time) publish_time,o.game_id, if(r.expand_channel = '','21',r.expand_channel) expand_channel,lower(trim(o.game_account)) game_account \nfrom ods_regi_rz r \njoin ods_order o on lower(trim(o.game_account))=lower(trim(r.game_account))\njoin (select distinct game_id from ods_publish_game) pg on r.game_id=pg.game_id\nwhere o.game_id is not null and o.order_status=4 and to_date(o.order_time) >='startdday' and to_date(o.order_time) <='currentday'  \ngroup by to_date(o.order_time),o.game_id, if(r.expand_channel = '','21',r.expand_channel),lower(trim(o.game_account))\n) tt\ngroup by split(tt.publish_time,' ')[0],tt.game_id,tt.expand_channel"
-    val payDayAccountSql="select split(tt.publish_time,' ')[0],tt.game_id,tt.expand_channel,count(distinct tt.game_account) total,tt.os,tt.group_id from (\nselect distinct o.order_time publish_time,o.game_id, if(r.expand_channel = '','21',r.expand_channel) expand_channel,lower(trim(o.game_account)) game_account,pg.os,pg.group_id\nfrom ods_regi_rz r \njoin ods_order o on lower(trim(o.game_account))=lower(trim(r.game_account))\njoin (select distinct old_game_id game_id,system_type os,group_id from game_sdk) pg on r.game_id=pg.game_id\nwhere o.game_id is not null and o.order_status=4 and prod_type=6 and to_date(o.order_time) >='startdday' and to_date(o.order_time) <='currentday'  \n) tt\ngroup by split(tt.publish_time,' ')[0],tt.game_id,tt.expand_channel,tt.os,tt.group_id "
-       .replace("startdday", startdday).replace("currentday", currentday)
+    //val payDayAccountSql="select split(tt.publish_time,' ')[0],tt.game_id,tt.expand_channel,count(distinct tt.game_account) total from (\nselect distinct min(o.order_time) publish_time,o.game_id, if(r.expand_channel = '','21',r.expand_channel) expand_channel,lower(trim(o.game_account)) game_account \nfrom ods_regi_rz r \njoin ods_order o on lower(trim(o.game_account))=lower(trim(r.game_account))\njoin (select distinct game_id from ods_publish_game) pg on r.game_id=pg.game_id\nwhere o.game_id is not null and o.order_status=4 and to_date(o.order_time) >='startdday' and to_date(o.order_time) <='currentday'  \ngroup by to_date(o.order_time),o.game_id, if(r.expand_channel = '','21',r.expand_channel),lower(trim(o.game_account))\n) tt\ngroup by split(tt.publish_time,' ')[0],tt.game_id,tt.expand_channel"
+    val payDayAccountSql = "select split(tt.publish_time,' ')[0],tt.game_id,tt.expand_channel,count(distinct tt.game_account) total,tt.os,tt.group_id from (\nselect distinct o.order_time publish_time,o.game_id, if(r.expand_channel = '','21',r.expand_channel) expand_channel,lower(trim(o.game_account)) game_account,pg.os,pg.group_id\nfrom ods_regi_rz r \njoin ods_order o on lower(trim(o.game_account))=lower(trim(r.game_account))\njoin (select distinct old_game_id game_id,system_type os,group_id from game_sdk) pg on r.game_id=pg.game_id\nwhere o.game_id is not null and o.order_status=4 and prod_type=6 and to_date(o.order_time) >='startdday' and to_date(o.order_time) <='currentday'  \n) tt\ngroup by split(tt.publish_time,' ')[0],tt.game_id,tt.expand_channel,tt.os,tt.group_id "
+      .replace("startdday", startdday).replace("currentday", currentday)
     val payDayAccountDf = sqlContext.sql(payDayAccountSql)
     foreachDayPayAccountPartition(payDayAccountDf)
 
 
     //保存点击
-    saveClick(sqlContext,startdday,currentday)
+    saveClick(sqlContext, startdday, currentday)
 
-    saveRequest(sc,sqlContext,startdday,currentday)
+    saveRequest(sc, sqlContext, startdday, currentday)
 
     System.clearProperty("spark.driver.port")
     sc.stop()
   }
+
   def saveRequest(sc: SparkContext, sqlContext: HiveContext, startdday: String, currentday: String): Unit = {
     //click off lime
     val requestRdd = sc.newAPIHadoopFile("hdfs://hadoopmaster:9000/user/hive/warehouse/yyft.db/request/*",
       classOf[CombineTextInputFormat],
       classOf[LongWritable],
       classOf[Text]).map(line => line._2.toString)
-     //100.97.15.217 - - [29/Jun/2017:16:54:53 +0800] "GET /Ssxy/loadComplete?p=auc_fttst_3995M5017&g=3995&os_info=6.0&os_type=1 HTTP/1.0" 200 43 "https://tg.pyw.cn/h5/lhzy/index23.html?p=auc_fttst_3995M5017&g=3995""Mozilla/5.0 (Linux; U; Android 6.0; zh-CN; Le X620 Build/HEXCNFN5902606111S) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/40.0.2214.89 UCBrowser/11.5.6.946 Mobile Safari/537.36" 61.158.146.228, 106.39.190.139, 116.211.165.18 tg.pyw.cn magpie 0.006 0.007 -
-    val filterRequestRdd = requestRdd .filter(line => !line.contains("HTTP/1.0\" 404")).filter(line => StringUtils.isRequestLog(line,".*0800] \"GET /Ssxy/loadComplete[?]p=[\\d|_|a-z|A-Z]+&g=[\\d]+.*")).map(line => {
+    //100.97.15.217 - - [29/Jun/2017:16:54:53 +0800] "GET /Ssxy/loadComplete?p=auc_fttst_3995M5017&g=3995&os_info=6.0&os_type=1 HTTP/1.0" 200 43 "https://tg.pyw.cn/h5/lhzy/index23.html?p=auc_fttst_3995M5017&g=3995""Mozilla/5.0 (Linux; U; Android 6.0; zh-CN; Le X620 Build/HEXCNFN5902606111S) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/40.0.2214.89 UCBrowser/11.5.6.946 Mobile Safari/537.36" 61.158.146.228, 106.39.190.139, 116.211.165.18 tg.pyw.cn magpie 0.006 0.007 -
+    val filterRequestRdd = requestRdd.filter(line => !line.contains("HTTP/1.0\" 404")).filter(line => StringUtils.isRequestLog(line, ".*0800] \"GET /Ssxy/loadComplete[?]p=[\\d|_|a-z|A-Z]+&g=[\\d]+.*")).map(line => {
       try {
-        val ip = line.split(" - - \\[",-1)(0)
+        val ip = line.split(" - - \\[", -1)(0)
 
-        val sp = line.split(" ")(6).split("p=",-1)(1).split("\"\"",-1)(0)
+        val sp = line.split(" ")(6).split("p=", -1)(1).split("\"\"", -1)(0)
         //expand_channel
-        val sp1 = sp.split("&g=",-1)
+        val sp1 = sp.split("&g=", -1)
 
         val requestDate = DateUtils.getDateForRequest(line)
-        if(sp1(1)==""){
-          Row("pyw",0,requestDate)
+        if (sp1(1) == "") {
+          Row("pyw", 0, requestDate)
         } else {
-          Row(StringUtils.defaultEmptyTo21(sp1(0)).toUpperCase(),Integer.parseInt(sp1(1).split("&",-1)(0)),requestDate+":01:10")
+          Row(StringUtils.defaultEmptyTo21(sp1(0)).toUpperCase(), Integer.parseInt(sp1(1).split("&", -1)(0)), requestDate + ":01:10")
         }
       } catch {
-        case ex: Exception =>{
-          Row("pyw",0,"0000-00-00 00:01:10")
+        case ex: Exception => {
+          Row("pyw", 0, "0000-00-00 00:01:10")
         }
       }
     })
     val requestStruct = (new StructType).add("expand_channel", StringType)
-      .add("game_id", IntegerType).add("publish_time",StringType)
+      .add("game_id", IntegerType).add("publish_time", StringType)
     val requestDF = sqlContext.createDataFrame(filterRequestRdd, requestStruct)
     requestDF.registerTempTable("tmp_request")
     sqlContext.sql("select a.expand_channel,a.game_id,a.publish_time from tmp_request a join (select distinct game_id from ods_publish_game) b on a.game_id=b.game_id " +
-      "where to_date(publish_time)>='"+startdday+"' and to_date(publish_time)<='"+currentday+"'").registerTempTable("tmp_filter_request")
+      "where to_date(publish_time)>='" + startdday + "' and to_date(publish_time)<='" + currentday + "'").registerTempTable("tmp_filter_request")
     sqlContext.cacheTable("tmp_filter_request")
     //bi_gamepublic_base_day_kpi request_click_num
     val rquestDayDf = sqlContext.sql("select split(publish_time,' ')[0] publish_time,game_id,expand_channel,count(1) from tmp_filter_request " +
@@ -128,9 +129,9 @@ object GamePublishPayAccountKpiOffLine {
         //1：展示数日志，2：下载数日志;3:广告展示
         val channelArray = StringUtils.getArrayChannel(insertedRow.getString(2))
         if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
-          paramsDay.+=(Array[Any](insertedRow.getString(0),insertedRow.get(1),channelArray(0),channelArray(1),channelArray(2),
-                      insertedRow.get(3),
-                      insertedRow.get(3)))
+          paramsDay.+=(Array[Any](insertedRow.getString(0), insertedRow.get(1), channelArray(0), channelArray(1), channelArray(2),
+            insertedRow.get(3),
+            insertedRow.get(3)))
         } else {
           logger.error("推广渠道格式错误：" + insertedRow.get(2) + " - " + insertedRow.get(1))
         }
@@ -143,6 +144,7 @@ object GamePublishPayAccountKpiOffLine {
       }
     })
   }
+
   def requestDayForeachPartition(clickHourDf: DataFrame): Unit = {
     clickHourDf.foreachPartition(rows => {
       val conn = MySqlUtils.getConn()
@@ -155,9 +157,9 @@ object GamePublishPayAccountKpiOffLine {
         //1：展示数日志，2：下载数日志;3:广告展示
         val channelArray = StringUtils.getArrayChannel(insertedRow.getString(2))
         if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
-          paramsDay.+=(Array[Any](insertedRow.getString(0),insertedRow.get(1),channelArray(0),channelArray(1),channelArray(2),
-                      insertedRow.get(3),
-                      insertedRow.get(3)))
+          paramsDay.+=(Array[Any](insertedRow.getString(0), insertedRow.get(1), channelArray(0), channelArray(1), channelArray(2),
+            insertedRow.get(3),
+            insertedRow.get(3)))
         } else {
           logger.error("推广渠道格式错误：" + insertedRow.get(2) + " - " + insertedRow.get(1))
         }
@@ -171,10 +173,10 @@ object GamePublishPayAccountKpiOffLine {
     })
   }
 
-  def saveClick(sqlContext: HiveContext,startdday : String,currentday : String): Unit = {
+  def saveClick(sqlContext: HiveContext, startdday: String, currentday: String): Unit = {
 
     sqlContext.sql("select upper(a.expand_channel) expand_channel,a.game_id,a.channel_time publish_time,a.channel_type from ods_channel a join (select distinct game_id from ods_publish_game) b on a.game_id=b.game_id " +
-      "where  to_date(channel_time)>='"+startdday+"' and to_date(channel_time)<='"+currentday+"'").registerTempTable("filter_click_tmp")
+      "where  to_date(channel_time)>='" + startdday + "' and to_date(channel_time)<='" + currentday + "'").registerTempTable("filter_click_tmp")
     sqlContext.cacheTable("filter_click_tmp")
 
     //bi_gamepublic_basekpi  show_num
@@ -216,7 +218,7 @@ object GamePublishPayAccountKpiOffLine {
       val sqlDayText = "insert into bi_gamepublic_base_day_kpi(publish_date,child_game_id,medium_channel,ad_site_channel,pkg_code,show_num) " +
         "values(?,?,?,?,?,?) " +
         "on duplicate key update show_num=?"
-     // val sql = "update bi_gamepublic_base_day_kpi set show_num=? where publish_date=? and child_game_id=? and medium_channel=? and ad_site_channel=? and pkg_code=?"
+      // val sql = "update bi_gamepublic_base_day_kpi set show_num=? where publish_date=? and child_game_id=? and medium_channel=? and ad_site_channel=? and pkg_code=?"
 
       val paramsDay = new ArrayBuffer[Array[Any]]()
       for (insertedRow <- rows) {
@@ -226,17 +228,17 @@ object GamePublishPayAccountKpiOffLine {
 
         if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
 
-          paramsDay.+=(Array[Any](insertedRow.getString(0),insertedRow.get(1),channelArray(0),channelArray(1),channelArray(2),
-                      insertedRow.get(3),
-                      insertedRow.get(3)))
+          paramsDay.+=(Array[Any](insertedRow.getString(0), insertedRow.get(1), channelArray(0), channelArray(1), channelArray(2),
+            insertedRow.get(3),
+            insertedRow.get(3)))
         } else {
           logger.error("推广渠道格式错误：" + insertedRow.get(2) + " - " + insertedRow.get(1))
         }
       }
 
-        MySqlUtils.doBatch(sqlDayText, paramsDay, conn)
+      MySqlUtils.doBatch(sqlDayText, paramsDay, conn)
 
-        conn.close
+      conn.close
 
     })
   }
@@ -254,12 +256,12 @@ object GamePublishPayAccountKpiOffLine {
 
         val channelArray = StringUtils.getArrayChannel(insertedRow.getString(2))
         if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
-          if(insertedRow.getString(2).endsWith("4283M10001") && insertedRow.getInt(1) == 4283){
-            println(insertedRow.getString(0)+" : "+insertedRow.getString(2)+" :hour: "+insertedRow.getInt(1)+" : "+ insertedRow.get(3))
+          if (insertedRow.getString(2).endsWith("4283M10001") && insertedRow.getInt(1) == 4283) {
+            println(insertedRow.getString(0) + " : " + insertedRow.getString(2) + " :hour: " + insertedRow.getInt(1) + " : " + insertedRow.get(3))
           }
-          paramsDay.+=(Array[Any](insertedRow.getString(0),insertedRow.get(1),channelArray(0),channelArray(1),channelArray(2),
-                      insertedRow.get(3),
-                      insertedRow.get(3)))
+          paramsDay.+=(Array[Any](insertedRow.getString(0), insertedRow.get(1), channelArray(0), channelArray(1), channelArray(2),
+            insertedRow.get(3),
+            insertedRow.get(3)))
           /*val ps = conn.prepareStatement(sqlDayText)
           ps.setString(1,insertedRow.getString(0))
           ps.setInt(2,insertedRow.getInt(1))
@@ -275,13 +277,14 @@ object GamePublishPayAccountKpiOffLine {
         }
       }
 
-        MySqlUtils.doBatch(sqlDayText, paramsDay, conn)
+      MySqlUtils.doBatch(sqlDayText, paramsDay, conn)
 
 
-        conn.close
+      conn.close
 
     })
   }
+
   def clickDownloadDayForeachPartition(clickHourDf: DataFrame): Unit = {
     clickHourDf.foreachPartition(rows => {
       val conn = MySqlUtils.getConn()
@@ -294,9 +297,9 @@ object GamePublishPayAccountKpiOffLine {
         //1：展示数日志，2：下载数日志;3:广告展示
         val channelArray = StringUtils.getArrayChannel(insertedRow.getString(2))
         if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
-          paramsDay.+=(Array[Any](insertedRow.getString(0),insertedRow.get(1),channelArray(0),channelArray(1),channelArray(2),
-                      insertedRow.get(3),
-                      insertedRow.get(3)))
+          paramsDay.+=(Array[Any](insertedRow.getString(0), insertedRow.get(1), channelArray(0), channelArray(1), channelArray(2),
+            insertedRow.get(3),
+            insertedRow.get(3)))
         } else {
           logger.error("推广渠道格式错误：" + insertedRow.get(2) + " - " + insertedRow.get(1))
         }
@@ -322,9 +325,9 @@ object GamePublishPayAccountKpiOffLine {
         //1：展示数日志，2：下载数日志;3:广告展示
         val channelArray = StringUtils.getArrayChannel(insertedRow.getString(2))
         if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
-          paramsDay.+=(Array[Any](insertedRow.getString(0),insertedRow.get(1),channelArray(0),channelArray(1),channelArray(2),
-                      insertedRow.get(3),
-                      insertedRow.get(3)))
+          paramsDay.+=(Array[Any](insertedRow.getString(0), insertedRow.get(1), channelArray(0), channelArray(1), channelArray(2),
+            insertedRow.get(3),
+            insertedRow.get(3)))
         } else {
           logger.error("推广渠道格式错误：" + insertedRow.get(2) + " - " + insertedRow.get(1))
         }
@@ -337,6 +340,7 @@ object GamePublishPayAccountKpiOffLine {
       }
     })
   }
+
   def clickAdDayForeachPartition(clickHourDf: DataFrame): Unit = {
     clickHourDf.foreachPartition(rows => {
       val conn = MySqlUtils.getConn()
@@ -349,9 +353,9 @@ object GamePublishPayAccountKpiOffLine {
         //1：展示数日志，2：下载数日志;3:广告展示
         val channelArray = StringUtils.getArrayChannel(insertedRow.getString(2))
         if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
-          paramsDay.+=(Array[Any](insertedRow.getString(0),insertedRow.get(1),channelArray(0),channelArray(1),channelArray(2),
-                      insertedRow.get(3),
-                      insertedRow.get(3)))
+          paramsDay.+=(Array[Any](insertedRow.getString(0), insertedRow.get(1), channelArray(0), channelArray(1), channelArray(2),
+            insertedRow.get(3),
+            insertedRow.get(3)))
         } else {
           logger.error("推广渠道格式错误：" + insertedRow.get(2) + " - " + insertedRow.get(1))
         }
@@ -377,9 +381,9 @@ object GamePublishPayAccountKpiOffLine {
         //1：展示数日志，2：下载数日志;3:广告展示
         val channelArray = StringUtils.getArrayChannel(insertedRow.getString(2))
         if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
-          paramsDay.+=(Array[Any](insertedRow.getString(0),insertedRow.get(1),channelArray(0),channelArray(1),channelArray(2),
-                      insertedRow.get(3),
-                      insertedRow.get(3)))
+          paramsDay.+=(Array[Any](insertedRow.getString(0), insertedRow.get(1), channelArray(0), channelArray(1), channelArray(2),
+            insertedRow.get(3),
+            insertedRow.get(3)))
         } else {
           logger.error("推广渠道格式错误：" + insertedRow.get(2) + " - " + insertedRow.get(1))
         }
@@ -409,8 +413,8 @@ object GamePublishPayAccountKpiOffLine {
           val channelArray = StringUtils.getArrayChannel(insertedRow.get(2).toString)
           if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
 
-            paramsDay.+=(Array[Any](insertedRow.getString(0),insertedRow.get(1),channelArray(0),channelArray(1),channelArray(2),insertedRow.get(3),insertedRow.get(4),insertedRow.get(5),
-                        insertedRow.get(3),insertedRow.get(4),insertedRow.get(5)))
+            paramsDay.+=(Array[Any](insertedRow.getString(0), insertedRow.get(1), channelArray(0), channelArray(1), channelArray(2), insertedRow.get(3), insertedRow.get(4), insertedRow.get(5),
+              insertedRow.get(3), insertedRow.get(4), insertedRow.get(5)))
           } else {
             logger.error("推广渠道格式错误：" + insertedRow.get(2) + " - " + insertedRow.get(1))
           }
@@ -444,8 +448,8 @@ object GamePublishPayAccountKpiOffLine {
           val channelArray = StringUtils.getArrayChannel(insertedRow.get(2).toString)
           if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
 
-            params.+=(Array[Any](insertedRow.get(0),insertedRow.get(1),channelArray(0),channelArray(1),channelArray(2),insertedRow.get(3),insertedRow.get(3),
-                      insertedRow.get(3),insertedRow.get(3)))
+            params.+=(Array[Any](insertedRow.get(0), insertedRow.get(1), channelArray(0), channelArray(1), channelArray(2), insertedRow.get(3), insertedRow.get(3),
+              insertedRow.get(3), insertedRow.get(3)))
 
           } else {
             logger.error("推广渠道格式错误：" + insertedRow.get(2) + " - " + insertedRow.get(1))

@@ -17,7 +17,6 @@ object GamePublishBaseKpiOffLine {
   val logger = Logger.getLogger(GamePublishBaseKpiOffLine.getClass)
 
 
-
   def main(args: Array[String]): Unit = {
 
 
@@ -227,6 +226,7 @@ object GamePublishBaseKpiOffLine {
       }
     })
   }
+
   def foreachDayDeviceGamePartition(accountDayGameDf: DataFrame) = {
     //把注册账号数结果存入mysql
     accountDayGameDf.foreachPartition(rows => {
@@ -242,7 +242,7 @@ object GamePublishBaseKpiOffLine {
         if (insertedRow.get(2) != null) {
           val channelArray = StringUtils.getArrayChannel(insertedRow.get(2).toString)
 
-            paramsDay.+=(Array[Any](insertedRow.getString(0), insertedRow.get(1),  insertedRow.get(2), insertedRow.get(3), insertedRow.get(4), insertedRow.get(5)))
+          paramsDay.+=(Array[Any](insertedRow.getString(0), insertedRow.get(1), insertedRow.get(2), insertedRow.get(3), insertedRow.get(4), insertedRow.get(5)))
         }
       }
 

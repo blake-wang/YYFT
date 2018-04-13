@@ -131,15 +131,15 @@ object GamePublishOtherFuns {
 
       val sqlText = "insert into bi_game_active(game_id,parent_channel,child_channel,ad_label,imie,update_time) values(?,?,?,?,?,?)"
       val params = new ArrayBuffer[Array[Any]]()
-      for(insertedRow <- rows){
+      for (insertedRow <- rows) {
         val channelArray = StringUtils.getArrayChannel(insertedRow.get(1).toString)
-        if(channelArray(0).length <=10 && channelArray(1).length<=10 && channelArray(2).length <=15) {
-          params.+=(Array[Any](insertedRow.get(0),channelArray(0),channelArray(1),channelArray(2),insertedRow.get(2),insertedRow.get(3)))
+        if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
+          params.+=(Array[Any](insertedRow.get(0), channelArray(0), channelArray(1), channelArray(2), insertedRow.get(2), insertedRow.get(3)))
         }
       }
-      try{
-        MySqlUtils.doBatch(sqlText,params,conn)
-      }finally{
+      try {
+        MySqlUtils.doBatch(sqlText, params, conn)
+      } finally {
         statement.close()
         conn.close
       }

@@ -1,38 +1,31 @@
 package cn.com.yyft.app
 
-import cn.com.yyft.utils._
-import kafka.serializer.StringDecoder
 import org.apache.log4j.Logger
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.{IntegerType, StringType, StructType}
-import org.apache.spark.streaming.kafka.{KafkaUtils, KafkaManager}
-import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.apache.spark.{SparkContext, SparkConf}
 
 /**
- * Created by JSJSB-0071 on 2016/11/21.
- */
+  * Created by JSJSB-0071 on 2016/11/21.
+  */
 object LoginTest {
   val logger = Logger.getLogger(LoginTest.getClass)
 
   def main(args: Array[String]) {
 
-   /*val sparkConf = new SparkConf().setAppName("LoginTest").setMaster("local[2]")
-    val sparkContext = new SparkContext(sparkConf)
-    val ssc = new StreamingContext(sparkContext, Seconds(2)) //Minutes(3) Seconds
+    /*val sparkConf = new SparkConf().setAppName("LoginTest").setMaster("local[2]")
+     val sparkContext = new SparkContext(sparkConf)
+     val ssc = new StreamingContext(sparkContext, Seconds(2)) //Minutes(3) Seconds
 
-    val topicsSet = "active".split(",").toSet
+     val topicsSet = "active".split(",").toSet
 
-    val kafkaParams = Map[String, String]("metadata.broker.list" -> "192.168.20.176:9092,192.168.20.177:9092,192.168.20.76:9092")
+     val kafkaParams = Map[String, String]("metadata.broker.list" -> "192.168.20.176:9092,192.168.20.177:9092,192.168.20.76:9092")
 
-    val messages = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
-      ssc, kafkaParams, topicsSet)
+     val messages = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
+       ssc, kafkaParams, topicsSet)
 
-    val valueMessageDstream = messages.map(_._2)
-    valueMessageDstream.print()
+     val valueMessageDstream = messages.map(_._2)
+     valueMessageDstream.print()
 
-    ssc.start()
-    ssc.awaitTermination()*/
+     ssc.start()
+     ssc.awaitTermination()*/
     println("aBCd".toUpperCase())
   }
 

@@ -6,8 +6,8 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig
 import redis.clients.jedis.JedisPool
 
 /**
- * Created by JSJSB-0071 on 2016/12/10.
- */
+  * Created by JSJSB-0071 on 2016/12/10.
+  */
 class MyRedisClient extends KryoSerializable {
 
 

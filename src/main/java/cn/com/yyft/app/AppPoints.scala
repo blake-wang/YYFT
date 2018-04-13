@@ -14,8 +14,8 @@ import scala.collection.mutable.ArrayBuffer
 
 
 /**
- * Created by sunzhiwei on 2016/5/23.
- */
+  * Created by sunzhiwei on 2016/5/23.
+  */
 object AppPoints extends Logging {
   val logger = Logger.getLogger(AppPoints.getClass)
 
@@ -34,7 +34,7 @@ object AppPoints extends Logging {
     val kafkaParams = Map[String, String](
       "metadata.broker.list" -> brokers,
       "group.id" -> "kafkatestgrouppointstest",
-      "auto.offset.reset" -> "largest"//smallest largest
+      "auto.offset.reset" -> "largest" //smallest largest
     )
     val km = new KafkaManager(kafkaParams)
     val messages = km.createDirectStream[String, String, StringDecoder, StringDecoder](ssc,
@@ -87,9 +87,9 @@ object AppPoints extends Logging {
           val pointsParams = new ArrayBuffer[Array[Any]]()
           val quotaParams = new ArrayBuffer[Array[Any]]()
           for (insertedRow <- insertedRows) {
-            pointsParams.+=(Array[Any](insertedRow(0),insertedRow(1),insertedRow(2),insertedRow(3),insertedRow(4)
-                                  ,insertedRow(5),insertedRow(6),insertedRow(7),insertedRow(8),insertedRow(9),DateUtils.getNowFullDate("yyyy-MM-dd HH:mm:ss")))
-            quotaParams.+=(Array[Any](insertedRow(2),insertedRow(3),DateUtils.getNowFullDate("yyyy-MM-dd HH:mm:ss")))
+            pointsParams.+=(Array[Any](insertedRow(0), insertedRow(1), insertedRow(2), insertedRow(3), insertedRow(4)
+              , insertedRow(5), insertedRow(6), insertedRow(7), insertedRow(8), insertedRow(9), DateUtils.getNowFullDate("yyyy-MM-dd HH:mm:ss")))
+            quotaParams.+=(Array[Any](insertedRow(2), insertedRow(3), DateUtils.getNowFullDate("yyyy-MM-dd HH:mm:ss")))
           }
 
 

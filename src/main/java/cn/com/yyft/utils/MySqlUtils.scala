@@ -4,12 +4,12 @@ import java.sql.{DriverManager, Connection}
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Created by sumenghu on 2016/8/9.
- */
+  * Created by sumenghu on 2016/8/9.
+  */
 
 object MySqlUtils {
-  def getFxConn() : Connection ={
-    val url =PropertiesUtils.getRelativePathValue("jdbc.xiaopeng2fx.url")
+  def getFxConn(): Connection = {
+    val url = PropertiesUtils.getRelativePathValue("jdbc.xiaopeng2fx.url")
     val driver = PropertiesUtils.getRelativePathValue("driver")
     try {
       Class.forName(driver)
@@ -19,8 +19,8 @@ object MySqlUtils {
   }
 
 
-  def getConn(): Connection ={
-    val url =PropertiesUtils.getRelativePathValue("url")
+  def getConn(): Connection = {
+    val url = PropertiesUtils.getRelativePathValue("url")
     val driver = PropertiesUtils.getRelativePathValue("driver")
     try {
       Class.forName(driver)
@@ -29,31 +29,22 @@ object MySqlUtils {
     }
   }
 
-  def doBatch(sqlText:String,params:ArrayBuffer[Array[Any]],conn:Connection): Unit ={
-    val pstat = conn.prepareStatement (sqlText)
+  def doBatch(sqlText: String, params: ArrayBuffer[Array[Any]], conn: Connection): Unit = {
+    val pstat = conn.prepareStatement(sqlText)
     //println("sqlText"+sqlText)
-    for(param <- params){
+    for (param <- params) {
       //println("param: "+param.mkString("##"))
-      for(index <- 0 to param.length - 1){
-        pstat.setObject(index+1,param(index))
+      for (index <- 0 to param.length - 1) {
+        pstat.setObject(index + 1, param(index))
       }
       pstat.addBatch()
     }
-    try{
+    try {
       pstat.executeBatch
-    }finally{
+    } finally {
       pstat.close
     }
   }
-
-
-
-
-
-
-
-
-
 
 
   /*def getValueArray(sql2Mysql:String): Array[String] ={

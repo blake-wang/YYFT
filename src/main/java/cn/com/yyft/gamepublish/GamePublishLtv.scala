@@ -1,6 +1,6 @@
 package cn.com.yyft.gamepublish
 
-import cn.com.yyft.utils.{StringUtils, PropertiesUtils, DateUtils, MySqlUtils}
+import cn.com.yyft.utils.{MySqlUtils, PropertiesUtils, StringUtils}
 import org.apache.log4j.Logger
 import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.{Logging, SparkConf, SparkContext}
@@ -8,13 +8,14 @@ import org.apache.spark.{Logging, SparkConf, SparkContext}
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Created by 苏孟虎 on 2016/8/29.
- * 对游戏发布数据报表统计-生命周期
- * 次日LTV：（1月1日新增用户在1月1日至1月2日的充值总金额）/1月1日新增用户数
- * 三日LTV：（1月1日新增用户在1月1日至1月3日的充值总金额）/1月1日新增用户数
- */
+  * Created by 苏孟虎 on 2016/8/29.
+  * 对游戏发布数据报表统计-生命周期
+  * 次日LTV：（1月1日新增用户在1月1日至1月2日的充值总金额）/1月1日新增用户数
+  * 三日LTV：（1月1日新增用户在1月1日至1月3日的充值总金额）/1月1日新增用户数
+  */
 object GamePublishLtv extends Logging {
   val logger = Logger.getLogger(GamePublishLtv.getClass)
+
   def main(args: Array[String]): Unit = {
 
 
@@ -39,11 +40,11 @@ object GamePublishLtv extends Logging {
     filterRegiDF.registerTempTable("filter_regi")
 
     /**
-     * 业务定义：
-     * 次日LTV：（1月1日新增用户在1月1日至1月2日的充值总金额）/1月1日新增用户数
-     * 三日LTV：（1月1日新增用户在1月1日至1月3日的充值总金额）/1月1日新增用户数
-     */
-    val ltvDayArray = Array[Int](2,3,4,5,6,7,15,30,60)
+      * 业务定义：
+      * 次日LTV：（1月1日新增用户在1月1日至1月2日的充值总金额）/1月1日新增用户数
+      * 三日LTV：（1月1日新增用户在1月1日至1月3日的充值总金额）/1月1日新增用户数
+      */
+    val ltvDayArray = Array[Int](2, 3, 4, 5, 6, 7, 15, 30, 60)
     for (ltvDay <- ltvDayArray) {
       val ltvDaySql = "select reg.reg_time,reg.game_id,reg.expand_channel,sum(if(o.order_status = 4,o.ori_price,-o.ori_price)) amount " +
         "from filter_regi reg join ods_order o on reg.game_account = o.game_account and o.order_status in(4,8) " +
@@ -76,7 +77,6 @@ object GamePublishLtv extends Logging {
       "left join ltv60_day ltv60day on ltv60day.reg_time=account.reg_time and ltv60day.game_id=account.game_id and ltv60day.expand_channel=account.expand_channel")
 
 
-
     //把结果存入mysql
     resultDf.foreachPartition(rows => {
       val conn = MySqlUtils.getConn()
@@ -88,20 +88,20 @@ object GamePublishLtv extends Logging {
         " on duplicate key update add_user_num=?,ltv_1day=?,ltv_2day=?,ltv_3day=?,ltv_4day=?,ltv_5day=?,ltv_6day=?,ltv_14day=?,ltv_29day=?,ltv_59day=?"
       val params = new ArrayBuffer[Array[Any]]()
       for (insertedRow <- rows) {
-        if(insertedRow.get(2) != null){
+        if (insertedRow.get(2) != null) {
           val channelArray = StringUtils.getArrayChannel(insertedRow.get(2).toString)
-          if(channelArray(0).length <=10 && channelArray(1).length<=10 && channelArray(2).length <=15) {
-            params.+=(Array[Any](insertedRow.get(0),insertedRow.get(1),channelArray(0),channelArray(1),channelArray(2),
-                      insertedRow.get(3),insertedRow.get(4),insertedRow.get(5),insertedRow.get(6)
-                      ,insertedRow.get(7),insertedRow.get(8),insertedRow.get(9),insertedRow.get(10),insertedRow.get(11),insertedRow.get(12),
-                      insertedRow.get(3),insertedRow.get(4),insertedRow.get(5),insertedRow.get(6)
-                      ,insertedRow.get(7),insertedRow.get(8),insertedRow.get(9),insertedRow.get(10),insertedRow.get(11),insertedRow.get(12)
-                      ))
-          }else {
-            logger.error("expand_channel format error: " + insertedRow.get(2) +" - " +insertedRow.get(1))
+          if (channelArray(0).length <= 10 && channelArray(1).length <= 10 && channelArray(2).length <= 15) {
+            params.+=(Array[Any](insertedRow.get(0), insertedRow.get(1), channelArray(0), channelArray(1), channelArray(2),
+              insertedRow.get(3), insertedRow.get(4), insertedRow.get(5), insertedRow.get(6)
+              , insertedRow.get(7), insertedRow.get(8), insertedRow.get(9), insertedRow.get(10), insertedRow.get(11), insertedRow.get(12),
+              insertedRow.get(3), insertedRow.get(4), insertedRow.get(5), insertedRow.get(6)
+              , insertedRow.get(7), insertedRow.get(8), insertedRow.get(9), insertedRow.get(10), insertedRow.get(11), insertedRow.get(12)
+            ))
+          } else {
+            logger.error("expand_channel format error: " + insertedRow.get(2) + " - " + insertedRow.get(1))
           }
         } else {
-          logger.error("expand_channel is null: " + insertedRow.get(0)+" - "+insertedRow.get(2) +" - " +insertedRow.get(1))
+          logger.error("expand_channel is null: " + insertedRow.get(0) + " - " + insertedRow.get(2) + " - " + insertedRow.get(1))
         }
       }
       try {

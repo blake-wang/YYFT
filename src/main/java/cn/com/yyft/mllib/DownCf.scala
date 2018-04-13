@@ -8,8 +8,8 @@ import org.apache.spark.{SparkContext, SparkConf}
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Created by JSJSB-0071 on 2017/1/4.
- */
+  * Created by JSJSB-0071 on 2017/1/4.
+  */
 object DownCf {
   def main(args: Array[String]) {
     val conf = new SparkConf().setMaster("local").setAppName("DownloadCF")
@@ -67,12 +67,12 @@ object DownCf {
       val recommendP = bestMode.recommendProducts(hashImei, 60);
       var gameIdRs = ""
       recommendP.sortBy(f => f.rating > f.rating).foreach(r => {
-        if(gameId != r.product) {
+        if (gameId != r.product) {
           gameIdRs = r.product + "|" + gameIdRs
         }
       })
-      gameIdRs = gameIdRs.substring(0,gameIdRs.length-1)
-      (gameId,gameIdRs)
+      gameIdRs = gameIdRs.substring(0, gameIdRs.length - 1)
+      (gameId, gameIdRs)
     })
 
     resultRdd.foreachPartition(par => {
@@ -82,7 +82,7 @@ object DownCf {
         " values(?,?) on duplicate key update game_id_rs=?"
       val params = new ArrayBuffer[Array[Any]]()
       for (r <- par) {
-        params.+=(Array[Any](r._1,r._2,r._1))
+        params.+=(Array[Any](r._1, r._2, r._1))
       }
       try {
         MySqlUtils.doBatch(sqlText, params, conn)

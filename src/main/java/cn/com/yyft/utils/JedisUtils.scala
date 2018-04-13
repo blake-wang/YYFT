@@ -1,15 +1,15 @@
 package cn.com.yyft.utils
 
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig
-import redis.clients.jedis.{JedisPool, Jedis}
+import redis.clients.jedis.JedisPool
 
 /**
- * Created by JSJSB-0071 on 2016/10/25.
- */
+  * Created by JSJSB-0071 on 2016/10/25.
+  */
 
 object JedisUtils {
 
-  def getPool()={
+  def getPool() = {
     val host = PropertiesUtils.getRelativePathValue("redis.host")
     val port = Integer.parseInt(PropertiesUtils.getRelativePathValue("redis.port"))
     val poolConfig = new GenericObjectPoolConfig();
@@ -27,14 +27,13 @@ object JedisUtils {
   }
 
 
+  /*val hook = new Thread {
+   override def run = {
+     println("Execute hook thread: " + this)
+     pool.destroy()
+   }
 
-   /*val hook = new Thread {
-    override def run = {
-      println("Execute hook thread: " + this)
-      pool.destroy()
-    }
-
-  }
-  sys.addShutdownHook(hook.run)*/
+ }
+ sys.addShutdownHook(hook.run)*/
 
 }
