@@ -1,0 +1,59 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../libs/mysql-connector-java-5.1.32.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../libs/spark-streaming-kafka_2.10-1.6.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../libs/commons-pool2-2.4.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../libs/jedis-2.9.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../libs/spark-examples-1.6.1-hadoop2.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../libs/spark-assembly-1.6.1-hadoop2.3.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../libs/spark-assembly-1.6.1-hadoop2.3.0.jar!/" />
+      <root url="file://$USER_HOME$/spark-1.6.1" />
+      <root url="file://$USER_HOME$/spark-1.6.1/bagel/src/main/scala" />
+      <root url="file://$USER_HOME$/spark-1.6.1/core/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/core/src/main/scala" />
+      <root url="file://$USER_HOME$/spark-1.6.1/core/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/dev/audit-release/maven_app_core/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/examples/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/external/flume/src/main/scala" />
+      <root url="file://$USER_HOME$/spark-1.6.1/external/flume/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/external/kafka/src/main/scala" />
+      <root url="file://$USER_HOME$/spark-1.6.1/external/kafka/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/external/mqtt/src/main/scala" />
+      <root url="file://$USER_HOME$/spark-1.6.1/external/mqtt/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/external/twitter/src/main/scala" />
+      <root url="file://$USER_HOME$/spark-1.6.1/external/twitter/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/external/zeromq/src/main/scala" />
+      <root url="file://$USER_HOME$/spark-1.6.1/external/zeromq/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/extras/java8-tests/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/extras/kinesis-asl/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/extras/kinesis-asl/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/graphx/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/graphx/src/main/scala" />
+      <root url="file://$USER_HOME$/spark-1.6.1/launcher/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/launcher/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/mllib/src/main/scala" />
+      <root url="file://$USER_HOME$/spark-1.6.1/mllib/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/network/common/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/network/common/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/network/shuffle/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/network/shuffle/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/network/yarn/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/sql/catalyst/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/sql/core/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/sql/core/src/test/gen-java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/sql/core/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/sql/hive/src/main/scala" />
+      <root url="file://$USER_HOME$/spark-1.6.1/sql/hive/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/streaming/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/streaming/src/main/scala" />
+      <root url="file://$USER_HOME$/spark-1.6.1/streaming/src/test/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/tags/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/unsafe/src/main/java" />
+      <root url="file://$USER_HOME$/spark-1.6.1/unsafe/src/test/java" />
+    </SOURCES>
+  </library>
+</component>

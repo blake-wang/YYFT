@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="YYFT:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/YYFT_jar</output-path>
+    <root id="archive" name="YYFT.jar">
+      <element id="module-output" name="YYFT" />
+    </root>
+  </artifact>
+</component>
